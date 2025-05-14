@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Material {
+  id                        String    @id @default(cuid())
+  name                      String    @unique
+  category                  String    // Now required
+  
+  // Core Properties (Optional in DB, target for data)
+  density                   Float?    // kg/m^3
+  youngsModulus             Float?    // Pa (Pascals)
+  ultimateTensileStrength   Float?    // Pa (Pascals)
+  thermalExpansionCoefficient Float?    // 1/°C
+  
+  // Other Mechanical Properties (Optional)
+  yieldStrength             Float?    // Pa (Pascals)
+  poissonsRatio             Float?    // Dimensionless
+  shearModulus              Float?    // Pa (Pascals)
+  elongationAtBreak         Float?    // % 
+  compressiveStrength       Float?    // Pa (Pascals)
+  flexuralStrength          Float?    // Pa (Pascals)
+  fractureToughness         Float?    // Pa·m^0.5
+
+  // Other Thermal/Physical Properties (Optional)
+  meltingPoint              Float?    // °C
+  hdt                       Float?    // °C (Heat Deflection Temperature)
+  maxServiceTemperature     Float?    // °C
+
+  // Composite Specific Properties (Optional)
+  fiberType                 String?   
+  matrixType                String?
+
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
+
+  @@map("materials")
+}
