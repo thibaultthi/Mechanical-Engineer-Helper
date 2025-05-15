@@ -125,26 +125,42 @@ async function getMaterials(ids: string[]) {
   if (!ids || ids.length === 0) {
     return [];
   }
-  return await prisma.material.findMany({
-    where: {
-      id: {
-        in: ids,
+  try {
+    console.log(`[getMaterials] Attempting to fetch materials for IDs: ${ids.join(', ')}`);
+    const materials = await prisma.material.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
       },
-    },
-    // Keep the required select fields
-    select: {
-      id: true,
-      name: true,
-      density: true,
-      youngsModulus: true,
-      yieldStrength: true,
-      ultimateTensileStrength: true,
-      poissonsRatio: true,
-      shearModulus: true,
-      thermalExpansionCoefficient: true,
-      category: true,
-    },
-  });
+      // Keep the required select fields
+      select: {
+        id: true,
+        name: true,
+        density: true,
+        youngsModulus: true,
+        yieldStrength: true,
+        ultimateTensileStrength: true,
+        poissonsRatio: true,
+        shearModulus: true,
+        thermalExpansionCoefficient: true,
+        category: true,
+      },
+    });
+    console.log(`[getMaterials] Successfully fetched ${materials.length} materials.`);
+    return materials;
+  } catch (error) {
+    console.error("[getMaterials] Error fetching materials:", error);
+    if (error instanceof Error) {
+      console.error("[getMaterials] Error name:", error.name);
+      console.error("[getMaterials] Error message:", error.message);
+      if ('code' in error) { // For Prisma-specific errors
+         console.error("[getMaterials] Prisma Error Code:", (error as any).code);
+      }
+    }
+    // Re-throwing to ensure build fails and Vercel shows it
+    throw new Error(`[getMaterials] Failed to fetch materials from DB during build. Original error: ${(error as Error).message}`);
+  }
 }
 
 // Keep type inference if needed for props
